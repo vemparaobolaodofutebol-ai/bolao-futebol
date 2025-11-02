@@ -5,6 +5,17 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Bolão do Futebol — Apostas</title>
   <link rel="stylesheet" href="./styles.css">
+  <style>
+    /* Garantir visibilidade dos campos de placar */
+    .row input {
+      display: inline-block !important;
+      width: 100%;
+      background: #fff;
+      color: #000;
+      text-align: center;
+      font-weight: 700;
+    }
+  </style>
 </head>
 <body>
   <div class="header">
@@ -34,6 +45,7 @@
   </div>
 
   <script>
+    // Dados fixos dos jogos
     const defaultMatches = [
       { label:"Jogo 01", home:"Botafogo", away:"Santos", date:"10/11/2025", time:"16:00" },
       { label:"Jogo 02", home:"Palmeiras", away:"Cruzeiro", date:"10/11/2025", time:"18:30" },
@@ -46,25 +58,28 @@
     const statusEl = document.getElementById("status");
     const btn = document.getElementById("btn");
 
+    // Função para montar os campos de placar
     function renderMatches(){
       matchesArea.innerHTML = "";
       defaultMatches.forEach((m, i) => {
-        const wrap = document.createElement("div");
-        wrap.className = "grid";
-        wrap.innerHTML = `
+        const bloco = document.createElement("div");
+        bloco.className = "grid";
+        bloco.innerHTML = `
           <label>${m.label} — ${m.date} às ${m.time}</label>
           <div class="row">
-            <input class="input" id="h_${i}" inputmode="numeric" pattern="[0-9]*" placeholder="${m.home}">
+            <input class="input" id="h_${i}" type="number" min="0" max="20" placeholder="${m.home}">
             <div class="x">x</div>
-            <input class="input" id="a_${i}" inputmode="numeric" pattern="[0-9]*" placeholder="${m.away}">
+            <input class="input" id="a_${i}" type="number" min="0" max="20" placeholder="${m.away}">
           </div>
         `;
-        matchesArea.appendChild(wrap);
+        matchesArea.appendChild(bloco);
       });
     }
 
-    renderMatches();
+    // Chamar a função ao carregar a página
+    document.addEventListener("DOMContentLoaded", renderMatches);
 
+    // Gerar número de cartão (4 dígitos)
     function nextSlipNumber(){
       const key = "bf_slip_counter_v1";
       let n = parseInt(localStorage.getItem(key) || "0", 10);
@@ -74,6 +89,7 @@
       return String(n).padStart(4,"0");
     }
 
+    // Botão "Gerar Cartão"
     btn.addEventListener("click", () => {
       try {
         statusEl.textContent = "";
@@ -99,8 +115,6 @@
         statusEl.textContent = "Erro: " + e.message;
       }
     });
-
-    renderMatches();
   </script>
 </body>
 </html>
