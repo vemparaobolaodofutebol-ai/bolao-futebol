@@ -1,11 +1,111 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
 <head>
   <meta charset="utf-8">
-  <title>Bolão do Futebol</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Bolão do Futebol — Apostas</title>
+  <link rel="stylesheet" href="./styles.css">
 </head>
-<body style="font-family:sans-serif;text-align:center;margin-top:100px;">
-  <h1>Bolão do Futebol ⚽</h1>
-  <p>Site de teste funcionando!</p>
+<body>
+  <div class="header">
+    <div class="logo">BF</div>
+    <div>
+      <h1>Bolão do Futebol</h1>
+      <div class="sub">Faça seus palpites e gere seu cartão</div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="card grid">
+      <label>Nome do apostador</label>
+      <input class="input" id="bettorName" maxlength="60" placeholder="Seu nome">
+
+      <div class="grid" id="matchesArea"></div>
+
+      <label>Valor / PIX (fixo nesta versão)</label>
+      <input class="input" id="pix" value="Valor R$ 10,00 — PIX: vemparaobolaodofutebol@gmail.com">
+
+      <label>Observações (fixo nesta versão)</label>
+      <textarea class="input" id="obs" rows="2">O bolão encerra no horário do primeiro jogo. Em caso de empate de pontos, critério: maior número de acertos exatos.</textarea>
+
+      <button class="btn" id="btn">Gerar Cartão</button>
+      <div class="help" id="status"></div>
+    </div>
+  </div>
+
+  <script>
+    const defaultMatches = [
+      { label:"Jogo 01", home:"Botafogo", away:"Santos", date:"10/11/2025", time:"16:00" },
+      { label:"Jogo 02", home:"Palmeiras", away:"Cruzeiro", date:"10/11/2025", time:"18:30" },
+      { label:"Jogo 03", home:"Flamengo", away:"Grêmio", date:"10/11/2025", time:"20:00" },
+      { label:"Jogo 04", home:"São Paulo", away:"Corinthians", date:"11/11/2025", time:"16:00" },
+      { label:"Jogo 05", home:"Vasco", away:"Fluminense", date:"11/11/2025", time:"18:30" },
+    ];
+
+    const matchesArea = document.getElementById("matchesArea");
+    const statusEl = document.getElementById("status");
+    const btn = document.getElementById("btn");
+
+    function renderMatches(){
+      matchesArea.innerHTML = "";
+      defaultMatches.forEach((m, i) => {
+        const wrap = document.createElement("div");
+        wrap.className = "grid";
+        wrap.innerHTML = `
+          <label>${m.label} — ${m.date} às ${m.time}</label>
+          <div class="row">
+            <input class="input" id="h_${i}" inputmode="numeric" pattern="[0-9]*" placeholder="${m.home}">
+            <div class="x">x</div>
+            <input class="input" id="a_${i}" inputmode="numeric" pattern="[0-9]*" placeholder="${m.away}">
+          </div>
+        `;
+        matchesArea.appendChild(wrap);
+      });
+    }
+    renderMatches();
+
+    function nextSlipNumber(){
+      // Contador local 4 dígitos (0001, 0002, ...). Persiste no navegador via localStorage.
+      const key = "bf_slip_counter_v1";
+      let n = parseInt(localStorage.getItem(key) || "0", 10);
+      n = (n + 1);
+      if (n > 9999) n = 1;
+      localStorage.setItem(key, String(n));
+      return String(n).padStart(4,"0");
+    }
+
+    btn.addEventListener("click", () => {
+      try {
+        statusEl.textContent = "";
+        const name = document.getElementById("bettorName").value.trim();
+        const pix = document.getElementById("pix").value.trim();
+        const obs = document.getElementById("obs").value.trim();
+        if(!name) throw new Error("Informe o nome do apostador");
+
+        const picks = [];
+        for(let i=0;i<defaultMatches.length;i++){
+          const hs = document.getElementById("h_"+i).value.trim();
+          const as = document.getElementById("a_"+i).value.trim();
+          if(hs==="" || as==="") { throw new Error("Preencha todos os placares"); }
+          picks.push({home_score: parseInt(hs,10), away_score: parseInt(as,10)});
+        }
+
+        const slip = nextSlipNumber();
+
+        // Enviar dados para a página do cartão via sessionStorage
+        const payload = {
+          bettor: name,
+          matches: defaultMatches,
+          picks,
+          pix, obs,
+          slip
+        };
+        sessionStorage.setItem("bf_card_data", JSON.stringify(payload));
+        window.open("./card.html","_blank");
+      } catch(e){
+        statusEl.textContent = "Erro: " + e.message;
+      }
+    });
+  </script>
 </body>
 </html>

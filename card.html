@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Cartão do Bolão</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body style="background:#0f1013;">
+  <div class="container">
+    <div class="ticket" id="ticket">
+      <div class="top">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <!-- Logo à esquerda -->
+          <div class="logo" style="background:#0b0d0f;color:#fff;border-radius:12px;">BF</div>
+          <div>
+            <div style="font-weight:900;">Bolão do Futebol</div>
+            <div class="small" id="t_bettor"></div>
+          </div>
+        </div>
+        <!-- Número do cartão no canto superior direito, 4 dígitos -->
+        <div class="badge" id="t_slip">0001</div>
+      </div>
+
+      <div class="hr"></div>
+      <div id="t_matches"></div>
+
+      <div class="hr"></div>
+      <div class="footer" id="t_pix"></div>
+      <div class="small" id="t_obs" style="margin-top:6px;"></div>
+    </div>
+    <div class="center small" style="margin-top:8px;color:#b8c3bf;">
+      Tire um print desta tela e envie no WhatsApp
+    </div>
+  </div>
+
+  <script>
+    function render(){
+      const raw = sessionStorage.getItem("bf_card_data");
+      if(!raw){
+        document.getElementById("t_bettor").textContent = "Dados não encontrados — gere o cartão pela página principal.";
+        return;
+      }
+      const data = JSON.parse(raw);
+      document.getElementById("t_bettor").textContent = "Apostador: " + data.bettor;
+      document.getElementById("t_slip").textContent = data.slip;
+
+      const t_matches = document.getElementById("t_matches");
+      t_matches.innerHTML = "";
+      data.matches.forEach((m, i) => {
+        const p = data.picks[i] || {home_score:"-", away_score:"-"};
+        const row = document.createElement("div");
+        row.className = "match";
+        row.innerHTML = `
+          <div style="flex:1;">
+            <div style="font-weight:700;">${m.label}</div>
+            <div class="small">${m.home} vs ${m.away} — ${m.date} ${m.time}</div>
+          </div>
+          <div class="score" style="font-weight:900;">${p.home_score} x ${p.away_score}</div>
+        `;
+        t_matches.appendChild(row);
+      });
+
+      document.getElementById("t_pix").textContent = data.pix || "";
+      document.getElementById("t_obs").textContent = data.obs || "";
+    }
+    render();
+  </script>
+</body>
+</html>
