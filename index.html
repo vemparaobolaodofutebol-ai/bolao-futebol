@@ -6,14 +6,34 @@
   <title>Bolão do Futebol — Apostas</title>
   <link rel="stylesheet" href="./styles.css">
   <style>
-    /* Garantir visibilidade dos campos de placar */
+    /* Correção visual dos campos de placar */
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
     .row input {
-      display: inline-block !important;
-      width: 100%;
+      width: 50px !important;
       background: #fff;
       color: #000;
-      text-align: center;
       font-weight: 700;
+      text-align: center;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+    }
+    .x {
+      color: #111;
+      font-weight: 900;
+      font-size: 16px;
+    }
+    .team-name {
+      color: #111 !important;
+      font-weight: 700;
+      font-size: 14px;
+      min-width: 80px;
+      text-align: center;
     }
   </style>
 </head>
@@ -45,7 +65,7 @@
   </div>
 
   <script>
-    // Dados fixos dos jogos
+    // Lista fixa dos jogos da rodada
     const defaultMatches = [
       { label:"Jogo 01", home:"Botafogo", away:"Santos", date:"10/11/2025", time:"16:00" },
       { label:"Jogo 02", home:"Palmeiras", away:"Cruzeiro", date:"10/11/2025", time:"18:30" },
@@ -58,7 +78,7 @@
     const statusEl = document.getElementById("status");
     const btn = document.getElementById("btn");
 
-    // Função para montar os campos de placar
+    // Monta visualmente os jogos com campos de placar
     function renderMatches(){
       matchesArea.innerHTML = "";
       defaultMatches.forEach((m, i) => {
@@ -67,19 +87,20 @@
         bloco.innerHTML = `
           <label>${m.label} — ${m.date} às ${m.time}</label>
           <div class="row">
-            <input class="input" id="h_${i}" type="number" min="0" max="20" placeholder="${m.home}">
+            <span class="team-name">${m.home}</span>
+            <input class="input" id="h_${i}" type="number" min="0" max="20">
             <div class="x">x</div>
-            <input class="input" id="a_${i}" type="number" min="0" max="20" placeholder="${m.away}">
+            <input class="input" id="a_${i}" type="number" min="0" max="20">
+            <span class="team-name">${m.away}</span>
           </div>
         `;
         matchesArea.appendChild(bloco);
       });
     }
 
-    // Chamar a função ao carregar a página
     document.addEventListener("DOMContentLoaded", renderMatches);
 
-    // Gerar número de cartão (4 dígitos)
+    // Gera número sequencial do cartão (4 dígitos)
     function nextSlipNumber(){
       const key = "bf_slip_counter_v1";
       let n = parseInt(localStorage.getItem(key) || "0", 10);
@@ -89,7 +110,7 @@
       return String(n).padStart(4,"0");
     }
 
-    // Botão "Gerar Cartão"
+    // Ação do botão "Gerar Cartão"
     btn.addEventListener("click", () => {
       try {
         statusEl.textContent = "";
@@ -107,7 +128,6 @@
         }
 
         const slip = nextSlipNumber();
-
         const payload = { bettor: name, matches: defaultMatches, picks, pix, obs, slip };
         sessionStorage.setItem("bf_card_data", JSON.stringify(payload));
         window.open("./card.html","_blank");
