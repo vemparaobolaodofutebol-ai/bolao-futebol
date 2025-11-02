@@ -47,3 +47,27 @@ label{font-size:13px;color:var(--muted)}
 .small{font-size:12px;color:#555}
 .center{text-align:center}
 .footer{margin-top:8px;font-size:12px;color:#333}
+/* Correção visual dos campos de placar */
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.row input {
+  width: 50px !important;
+  background: #fff;
+  color: #000;
+  font-weight: 700;
+  text-align: center;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+}
+
+.x {
+  color: #111;
+  font-weight: 900;
+  font-size: 16px;
+}
