@@ -71,3 +71,12 @@ label{font-size:13px;color:var(--muted)}
   font-weight: 900;
   font-size: 16px;
 }
+
+/* Tornar visíveis os nomes dos times */
+.team-name {
+  color: #111 !important;    /* texto preto visível sobre fundo claro */
+  font-weight: 700;
+  font-size: 14px;
+  min-width: 80px;
+  text-align: center;
+}
